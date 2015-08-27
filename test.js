@@ -1,11 +1,11 @@
 'use strict';
 
 var cls = require('continuation-local-storage');
-const clsns = cls.createNamespace('app');
+var clsns = cls.createNamespace('app');
 
 var mongoose = require('mongoose');
 
-var clsMongoose = require('.');
+var clsMongoose = require('./index.js');
 clsMongoose(clsns);
 
 var tap = require('tap');
@@ -41,26 +41,46 @@ tap.test("mongoose with cls", function (t) {
                 //prove that the cls-stored value is available across setTimeout()
                 t.equals(clsns.get("nsvalue"), "set");
 
-                //do Model.find
-                TestModel.find({}, function(err, findResult) {
 
+                TestModel.aggregate({$match: {"nonexistent_field": "nonexistent_value"}}
+                                   ).exec(function(err, aggregateResult) {
                     //check that the cls-stored value is still available
                     t.equals(clsns.get("nsvalue"), "set");
-                    if (clsns.get("nsvalue") !== "set") t.bailout("cls value empty after TestModel.find() - mongooseVersion: " + mongooseVersion);   //FAILS HERE ON MONGOOSE 4.0 or 4.1 but 3.8 or 3.9 are ok
+                    if (clsns.get("nsvalue") !== "set") t.bailout("cls value empty after TestModel.aggregate() - mongooseVersion: " + mongooseVersion);
 
-                    //do Model.update
-                    TestModel.update(
-                        {"nonexistent_field": "nonexistent_value"},
-                        {$set: {value: "modified entry"}}, function(err, updateResult) {
 
+                    //do Model.find
+                    TestModel.find({}, function(err, findResult) {
                         //check that the cls-stored value is still available
                         t.equals(clsns.get("nsvalue"), "set");
+                        if (clsns.get("nsvalue") !== "set") t.bailout("cls value empty after TestModel.find() - mongooseVersion: " + mongooseVersion);   //FAILS HERE ON MONGOOSE 4.0 or 4.1 but 3.8 or 3.9 are ok
 
-                        if (clsns.get("nsvalue") !== "set") t.bailout("cls value empty after TestModel.update() - mongooseVersion: " + mongooseVersion);       //FAILS HERE ON MONGOOSE 3.8 or 3.9
 
-                        t.end();
+                        //do Model.update
+                        TestModel.update(
+                            {"nonexistent_field": "nonexistent_value"},
+                            {$set: {value: "modified entry"}}, function(err, updateResult) {
+
+                            //check that the cls-stored value is still available
+                            t.equals(clsns.get("nsvalue"), "set");
+                            if (clsns.get("nsvalue") !== "set") t.bailout("cls value empty after TestModel.update() - mongooseVersion: " + mongooseVersion);       //FAILS HERE ON MONGOOSE 3.8 or 3.9
+
+
+                            //do Model.distinct
+                            TestModel.distinct('doesntExist', function (err, findResult) {
+                                t.equals(clsns.get("nsvalue"), "set");
+                                if (clsns.get("nsvalue") !== "set") t.bailout("cls value empty after TestModel.distinct() - mongooseVersion: " + mongooseVersion);
+
+
+                                TestModel.count({}, function (err, findResult) {
+                                    t.equals(clsns.get("nsvalue"), "set");
+                                    if (clsns.get("nsvalue") !== "set") t.bailout("cls value empty after TestModel.count() - mongooseVersion: " + mongooseVersion);
+
+                                    t.end();
+                                });
+                            });
+                        });
                     });
-
                 });
 
             }, 500);
