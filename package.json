@@ -24,12 +24,13 @@
     "shimmer": "^1"
   },
   "peerDependencies": {
-    "mongoose": "^3.8"
+    "mongoose": "^4"
   },
   "devDependencies": {
     "tap": "~1.3.2",
-    "mongoose": "^3.8",
-    "continuation-local-storage": "*"
+    "mongoose": "^4",
+    "continuation-local-storage": "*",
+    "should": "*"
   }
 
 }
