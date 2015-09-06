@@ -8,14 +8,14 @@ module.exports = function patchMPromise(ns) {
   if (typeof ns.bind !== 'function') {
     throw new TypeError("must include namespace to patch Mongoose against");
   }
-/*
+  
   shimmer.wrap(mongoose.Mongoose.prototype.Promise.prototype, 'on', function (original) {
     return function(event, callback) {
       callback = ns.bind(callback);
       return original.call(this, event, callback);
     };
   });
-*/
+  
   shimmer.wrap(mongoose.Mongoose.prototype.Query.prototype, 'exec', function (original) {
     return function(op, callback) {
       if (typeof op == 'function') op = ns.bind(op);
