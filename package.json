@@ -24,7 +24,7 @@
     "shimmer": "^1"
   },
   "peerDependencies": {
-    "mongoose": ">= 3.8.16 < 5"
+    "mongoose": ">= 3.8.16 <= 4.5.0"
   },
   "devDependencies": {
     "tap": "~1.3.2",
