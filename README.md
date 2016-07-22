@@ -2,11 +2,11 @@
 
 Adds CLS wrapper for Mongoose, making mongoose safe to use with [continuation-local-storage](https://github.com/othiym23/node-continuation-local-storage).
 
-Usage: 
+Usage:
 
 ```js
 var cls = require('continuation-local-storage');
-var clsMongoose = require('cls-mongoose');
+var clsMongoose = require('fh-cls-mongoose');
 
 // or cls.getNamespace if exists
 var clsns = cls.createNamespace('app');
